@@ -23,15 +23,18 @@
             <input id="stock" type="text">
         </p>
         <button type="button" onclick="consultar()">Consultar</button>
-        <button type="button" onclick="guardarEnCache()">Guardar</button>
+        <button type="button" onclick="editar()">Editar</button>
+        <button type="button" onclick="eliminar()">Eliminar</button>
+        <button type="button" onclick="guardar()">Guardar</button>
     </form>
 </body>
 
 </html>
 <script>
+    const host = "http://localhost:8080";
     function consultar() {
         const nombre = document.getElementById("nombre").value;
-        fetch(`http://localhost:8080/producto/consultar/${nombre}`)
+        fetch(`${host}/producto/consultar/${nombre}`)
             .then(res => res.json())
             .then(res => {
                 document.getElementById("precio").value = res.price;
@@ -51,7 +54,6 @@
             }
         }
     )
-
     const guardarEnDD = (data) => new Promise(
         async function (resolve, reject) {
             try {
@@ -77,5 +79,64 @@
             .then(res => guardarEnDD(res))
             .then(res => notificar())
             .catch(error => console.log(error));
+    }
+
+    function guardar() {
+        //Capturar los datos en los inputs
+        const nom = document.getElementById("nombre").value;
+        const pre = document.getElementById("precio").value;
+        const stk = document.getElementById("stock").value;
+        //Enviar petición AJAX hacia el servidor (consumir la API)
+        /*
+        Asíncrono
+        Javascript
+        And
+        XML
+        */
+        fetch(`${host}/producto/guardar`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ nombre: nom, precio: pre, stock: stk })
+        }).then(data => data.json())
+            .then(data => {
+                if (data.estado == "ok")
+                    location.href = "mensajeOK.html";
+                else
+                    location.href = "mensajeError.html";
+            })
+        //Mostrar respuesta del servidor
+    }
+
+    function editar() {
+        //Capturar los datos en los inputs
+        const nom = document.getElementById("nombre").value;
+        const pre = document.getElementById("precio").value;
+        const stk = document.getElementById("stock").value;
+        //Enviar petición AJAX hacia el servidor (consumir la API)
+        fetch(`${host}/producto/editar`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ nombre: nom, precio: pre, stock: stk })
+        }).then(data => data.json())
+            .then(data => {
+                alert(data.msg);  //Mostrar respuesta del servidor
+            })
+    }
+
+    function eliminar() {
+        const resp = confirm("Realmente desea Eliminar el producto?");
+        if (resp) {
+            //Capturar los datos en los inputs
+            const nom = document.getElementById("nombre").value;
+            //Enviar petición AJAX hacia el servidor (consumir la API)
+            fetch(`${host}/producto/eliminar`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ nombre: nom })
+            }).then(data => data.json())
+                .then(data => {
+                    alert(data.msg);  //Mostrar respuesta del servidor
+                })
+        }
     }
 </script>
