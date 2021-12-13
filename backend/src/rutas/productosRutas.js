@@ -1,10 +1,25 @@
 const { Router } = require("express");
 const productoRutas = Router();
+const { productosModel } = require("../modelos/productosModel");
 
 //API Rest: verbo, ruta, endpoint
 productoRutas.post("/consultar", function (req, res) {
     const { nombre } = req.body // {nombre:"mango",precio:200,stock:30}
-    Productos.findOne({ nombre }, function (error, prod) {
+    productosModel.findOne({ nombre }, function (error, prod) {
+        if (error) {
+            return res.send({ estado: "error", msg: "ERROR al buscar Producto" })
+        } else {
+            if (prod !== null) {
+                res.send({ estado: "ok", msg: "Producto Encontrado", data: prod });
+            } else {
+                res.send({ estado: "error", msg: "Producto NO Encontrado" });
+            }
+        }
+    })
+})
+
+productoRutas.post("/listar", function (req, res) {
+    productosModel.find({}, function (error, prod) {
         if (error) {
             return res.send({ estado: "error", msg: "ERROR al buscar Producto" })
         } else {
@@ -27,7 +42,7 @@ productoRutas.post("/consultar", function (req, res) {
  */
 productoRutas.post("/guardar", function (req, res) {
     const data = req.body;
-    const prod = new Productos(data);
+    const prod = new productosModel(data);
     prod.save(function (error) {
         if (error) {
             res.send({ estado: "error", msg: "ERROR: Producto NO Guardado :(" });

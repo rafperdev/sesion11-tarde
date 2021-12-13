@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const Productos = require("./modelos/productosModel");
 const { productoRutas } = require("./rutas/productosRutas");
 const { userRutas } = require("./rutas/userRutas");
+const { ventasRutas } = require("./rutas/ventasRutas");
 const app = express();
 require("dotenv").config();
 
@@ -12,6 +13,7 @@ app.use(express.json()); //Middleware para convertir a JSON
 
 app.use("/producto", productoRutas);
 app.use("/user", userRutas);
+app.use("/ventas", ventasRutas);
 //Conecta a la BD
 mongoose.connect(process.env.URL_DATABASE)
     .then(res => console.log("Conectado a BD"))
