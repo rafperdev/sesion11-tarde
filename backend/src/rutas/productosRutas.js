@@ -43,15 +43,18 @@ productoRutas.post("/listar", function (req, res) {
  */
 productoRutas.post("/guardar", function (req, res) {
     const data = req.body;
-    if (data._id !== null) {
+    if (data._id !== null && data._id !== "") {
         productosModel.updateOne({ _id: data._id }, { $set: { nombre: data.nombre, precio: data.precio, stock: data.stock } }, function (error) {
             if (error) {
-                res.status(500).json({ estado: "error", msg: "ERROR: Producto NO Guardado!" })
+                console.log(error)
+                return res.status(500).json({ estado: "error", msg: "ERROR: Producto NO Guardado!" })
             }
             res.status(200).json({ estado: "ok", msg: "Producto Guardado!" })
         })
     } else {
-        const prod = new productosModel(data);
+        const { nombre, precio, stock } = data;
+        const datos = { nombre, precio, stock };
+        const prod = new productosModel(datos);
         prod.save(function (error) {
             if (error) {
                 res.send({ estado: "error", msg: "ERROR: Producto NO Guardado :(" });
