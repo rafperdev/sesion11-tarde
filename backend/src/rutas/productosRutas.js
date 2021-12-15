@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const productoRutas = Router();
 const { productosModel } = require("../modelos/productosModel");
+const { ObjectId } = require("mongoose");
 
 //API Rest: verbo, ruta, endpoint
 productoRutas.post("/consultar", function (req, res) {
@@ -42,14 +43,23 @@ productoRutas.post("/listar", function (req, res) {
  */
 productoRutas.post("/guardar", function (req, res) {
     const data = req.body;
-    const prod = new productosModel(data);
-    prod.save(function (error) {
-        if (error) {
-            res.send({ estado: "error", msg: "ERROR: Producto NO Guardado :(" });
-            return false;
-        }
-        res.send({ estado: "ok", msg: "Producto Guardado!" });
-    })
+    if (data._id !== null) {
+        productosModel.updateOne({ _id: data._id }, { $set: { nombre: data.nombre, precio: data.precio, stock: data.stock } }, function (error) {
+            if (error) {
+                res.status(500).json({ estado: "error", msg: "ERROR: Producto NO Guardado!" })
+            }
+            res.status(200).json({ estado: "ok", msg: "Producto Guardado!" })
+        })
+    } else {
+        const prod = new productosModel(data);
+        prod.save(function (error) {
+            if (error) {
+                res.send({ estado: "error", msg: "ERROR: Producto NO Guardado :(" });
+                return false;
+            }
+            res.send({ estado: "ok", msg: "Producto Guardado!" });
+        })
+    }
 });
 
 /**
